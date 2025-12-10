@@ -126,7 +126,7 @@ builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGarmentService, GarmentService>();
 builder.Services.AddScoped<IRentalService, RentalService>();
-// Add other services here (PaymentService)
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 

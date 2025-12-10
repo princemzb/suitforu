@@ -1,0 +1,6 @@
+@SuitForU.API_HostAddress = http://localhost:5156
+
+GET {{SuitForU.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

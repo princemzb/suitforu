@@ -259,7 +259,7 @@ public class GarmentsController : ControllerBase
 
     private Guid? GetCurrentUserId()
     {
-        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier || c.Type == "sub")?.Value;
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (Guid.TryParse(userIdClaim, out var userId))
         {
             return userId;

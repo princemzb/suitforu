@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SuitForU.Application.DTOs.Auth;
 using SuitForU.Application.DTOs.Common;
 using SuitForU.Application.Interfaces;
+using System.Security.Claims;
 
 namespace SuitForU.API.Controllers;
 
@@ -192,8 +193,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public IActionResult GetCurrentUser()
     {
-        var userId = User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
-        var email = User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
         
         return Ok(ApiResponse<object>.SuccessResponse(new { UserId = userId, Email = email }));
     }

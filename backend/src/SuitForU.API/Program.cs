@@ -10,6 +10,10 @@ using SuitForU.Infrastructure.Persistence;
 using SuitForU.Infrastructure.Repositories;
 using SuitForU.Infrastructure.Services;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+
+// Désactiver le mapping automatique des claims JWT (garde "sub", "email" au lieu de les transformer)
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
 var builder = WebApplication.CreateBuilder(args);
 

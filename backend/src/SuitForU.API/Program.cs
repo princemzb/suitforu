@@ -125,7 +125,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGarmentService, GarmentService>();
-// Add other services here (RentalService, PaymentService)
+builder.Services.AddScoped<IRentalService, RentalService>();
+// Add other services here (PaymentService)
 
 var app = builder.Build();
 

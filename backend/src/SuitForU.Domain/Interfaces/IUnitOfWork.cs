@@ -9,6 +9,9 @@ public interface IUnitOfWork : IDisposable
     IRepository<Domain.Entities.Review> Reviews { get; }
     IRepository<Domain.Entities.GarmentImage> GarmentImages { get; }
     IRefreshTokenRepository RefreshTokens { get; }
+    IRepository<Domain.Entities.Conversation> Conversations { get; }
+    IRepository<Domain.Entities.Message> Messages { get; }
+    IRepository<Domain.Entities.GarmentAvailability> GarmentAvailabilities { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);

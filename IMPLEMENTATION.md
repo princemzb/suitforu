@@ -13,13 +13,16 @@
 - ✅ Entités complètes :
   - `User` - Gestion des utilisateurs
   - `Garment` - Vêtements à louer
-  - `GarmentImage` - Images des vêtements
-  - `Rental` - Locations
-  - `Payment` - Paiements
-  - `Review` - Avis
-  - `RefreshToken` - Tokens de rafraîchissement avec rotation et traçabilité
-- ✅ Enums : AuthProvider, GarmentType, GarmentCondition, RentalStatus, PaymentMethod, PaymentStatus
-- ✅ Interfaces : IRepository<T>, IUnitOfWork, IRefreshTokenRepository, repositories spécifiques
+  - `GarmentImage` - Images des vêtements (max 3 par vêtement)
+  - `Rental` - Locations avec workflow complet
+  - `Payment` - Paiements avec simulation Stripe
+  - `Review` - Avis et notes
+  - `RefreshToken` - Tokens JWT avec rotation et traçabilité
+  - `Conversation` - Conversations entre utilisateurs autour d'un vêtement
+  - `Message` - Messages avec statut lu/non-lu
+  - `GarmentAvailability` - Calendrier de disponibilité (3 mois)
+- ✅ Enums : AuthProvider, GarmentType, GarmentCondition, RentalStatus, PaymentMethod, PaymentStatus, PaymentType, AvailabilityBlockReason
+- ✅ Interfaces : IRepository<T>, IUnitOfWork, repositories spécifiques
 
 #### 3. Application Layer (`SuitForU.Application`)
 - ✅ DTOs complets pour Auth, Garments, Rentals, Payments
@@ -45,25 +48,56 @@
   - FluentValidation
   - Dependency Injection
 
-### ⏳ À Compléter (Backend)
+### ✅ Backend 100% Complet
 
-#### Services Application
+#### Services Application (8/8)
 ```csharp
 // Dans SuitForU.Infrastructure/Services/
-✅ AuthService.cs          // Authentification avec Refresh Token Rotation
-⏳ GarmentService.cs       // Gestion des vêtements
-⏳ RentalService.cs        // Gestion des locations
-⏳ PaymentService.cs       // Intégration Stripe
+✅ AuthService.cs            // Authentification avec Refresh Token Rotation
+✅ GarmentService.cs         // Gestion des vêtements (CRUD + upload images)
+✅ RentalService.cs          // Gestion des locations (workflow complet)
+✅ PaymentService.cs         // Intégration Stripe (MVP simulation)
+✅ ConversationService.cs    // Messagerie contextuelle vêtement
+✅ AvailabilityService.cs    // Calendrier de disponibilité 3 mois
+✅ TokenService.cs           // Génération JWT et Refresh Tokens
+✅ FileStorageService.cs     // Gestion upload fichiers
 ```
 
-#### Controllers API
+#### Controllers API (6/6 - 37 endpoints)
 ```csharp
 // Dans SuitForU.API/Controllers/
-✅ AuthController.cs       // 7 endpoints: Register, Login, Refresh, Logout, External, ConfirmEmail, Me
-⏳ GarmentsController.cs   // CRUD vêtements
-⏳ RentalsController.cs    // Gestion locations
-⏳ PaymentsController.cs   // Traitement paiements
-⏳ UsersController.cs      // Profil utilisateur
+✅ AuthController.cs              // 7 endpoints: Register, Login, Refresh, Logout, External, ConfirmEmail, Me
+✅ GarmentsController.cs          // 7 endpoints: CRUD, Search, Upload, MyGarments
+✅ RentalsController.cs           // 7 endpoints: Create, Get, MyRentals, OwnerRentals, Accept, Confirm, Cancel
+✅ PaymentsController.cs          // 5 endpoints: CreateIntent, Confirm, MyPayments, Refund, Webhook
+✅ ConversationsController.cs     // 6 endpoints: Create, List, GetMessages, SendMessage, MarkRead, MarkMessageRead
+✅ AvailabilityController.cs      // 4 endpoints: GetCalendar, Check, Block, Unblock
+```
+
+#### Base de données (10 tables)
+```sql
+✅ Users                    // Utilisateurs avec authentification
+✅ RefreshTokens            // Tokens JWT avec rotation
+✅ Garments                 // Vêtements de cérémonie
+✅ GarmentImages            // Images (max 3 par vêtement)
+✅ Rentals                  // Locations avec workflow
+✅ Payments                 // Paiements Stripe
+✅ Reviews                  // Avis et notes
+✅ Conversations            // Messagerie contextuelle
+✅ Messages                 // Messages avec statut lu
+✅ GarmentAvailabilities    // Calendrier 3 mois
+```
+
+#### Documentation technique
+```
+✅ README.md                    // Vue d'ensemble du projet
+✅ IMPLEMENTATION.md            // État d'avancement détaillé
+✅ backend/README.md            // Documentation backend
+✅ backend/API_ENDPOINTS.md     // 37 endpoints documentés
+✅ backend/DATABASE.md          // Schéma de BDD complet
+✅ backend/TESTS_SWAGGER.md     // Scénarios de test
+✅ backend/database_creation_script.sql  // Script de création
+✅ .github/copilot-instructions.md       // Instructions Copilot
 ```
 
 #### Configurations EF Core
@@ -76,28 +110,52 @@
 ✅ PaymentConfiguration.cs
 ✅ ReviewConfiguration.cs
 ✅ RefreshTokenConfiguration.cs
+✅ ConversationConfiguration.cs
+✅ MessageConfiguration.cs
+✅ GarmentAvailabilityConfiguration.cs
 ```
+
+### ⏳ Améliorations futures (Backend)
 
 #### Tests Unitaires
 ```csharp
 // À créer dans tests/SuitForU.Application.Tests/
-- Services/AuthServiceTests.cs
-- Services/GarmentServiceTests.cs
-- Services/RentalServiceTests.cs
-- Validators/ValidatorTests.cs
+⏳ Services/AuthServiceTests.cs
+⏳ Services/GarmentServiceTests.cs
+⏳ Services/RentalServiceTests.cs
+⏳ Services/ConversationServiceTests.cs
+⏳ Services/AvailabilityServiceTests.cs
+⏳ Validators/ValidatorTests.cs
 
 // À créer dans tests/SuitForU.Infrastructure.Tests/
-- Repositories/RepositoryTests.cs
+⏳ Repositories/RepositoryTests.cs
 ```
 
 #### Middleware & Filters
 ```csharp
 // À créer dans SuitForU.API/Middleware/
-- ExceptionHandlingMiddleware.cs
-- LoggingMiddleware.cs
+⏳ ExceptionHandlingMiddleware.cs  // Gestion globale des erreurs
+⏳ LoggingMiddleware.cs            // Logging des requêtes
+⏳ RateLimitingMiddleware.cs       // Limitation du taux de requêtes
 ```
 
-### 🚧 Non Commencé
+#### Fonctionnalités avancées
+```
+⏳ Notifications (Email + Push)
+⏳ Système de recherche avancé (Elasticsearch)
+⏳ Géolocalisation et carte interactive
+⏳ Export de données (PDF, Excel)
+⏳ Tableau de bord analytics
+⏳ Intégration Stripe complète (pas simulation)
+⏳ Upload images vers cloud (Azure Blob / AWS S3)
+⏳ Optimisation des images (compression, formats WebP)
+⏳ Cache Redis pour performances
+⏳ WebSockets pour chat en temps réel
+```
+
+---
+
+## 🚧 Frontend - Non Commencé
 
 #### Application Mobile Flutter
 ```

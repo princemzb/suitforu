@@ -258,6 +258,93 @@ END
 GO
 
 -- =============================================
+-- Table: Conversations
+-- Description: Conversations entre utilisateurs concernant un vêtement
+-- =============================================
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Conversations]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Conversations] (
+        [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+        [GarmentId] UNIQUEIDENTIFIER NOT NULL,
+        [User1Id] UNIQUEIDENTIFIER NOT NULL,
+        [User2Id] UNIQUEIDENTIFIER NOT NULL,
+        [LastMessageAt] DATETIME2 NULL,
+        [LastMessageContent] NVARCHAR(500) NULL,
+        [LastMessageSenderId] UNIQUEIDENTIFIER NULL,
+        [CreatedAt] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME2 NULL,
+        [IsDeleted] BIT NOT NULL DEFAULT 0,
+        CONSTRAINT FK_Conversations_Garments FOREIGN KEY ([GarmentId]) REFERENCES [dbo].[Garments]([Id]),
+        CONSTRAINT FK_Conversations_User1 FOREIGN KEY ([User1Id]) REFERENCES [dbo].[Users]([Id]),
+        CONSTRAINT FK_Conversations_User2 FOREIGN KEY ([User2Id]) REFERENCES [dbo].[Users]([Id])
+    );
+    
+    CREATE INDEX IX_Conversations_User1Id ON [dbo].[Conversations]([User1Id]);
+    CREATE INDEX IX_Conversations_User2Id ON [dbo].[Conversations]([User2Id]);
+    CREATE INDEX IX_Conversations_GarmentId ON [dbo].[Conversations]([GarmentId]);
+    CREATE INDEX IX_Conversations_LastMessageAt ON [dbo].[Conversations]([LastMessageAt]);
+    CREATE UNIQUE INDEX IX_Conversations_GarmentId_Users ON [dbo].[Conversations]([GarmentId], [User1Id], [User2Id]);
+    PRINT 'Table Conversations created successfully.';
+END
+GO
+
+-- =============================================
+-- Table: Messages
+-- Description: Messages échangés dans les conversations
+-- =============================================
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Messages]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[Messages] (
+        [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+        [ConversationId] UNIQUEIDENTIFIER NOT NULL,
+        [SenderId] UNIQUEIDENTIFIER NOT NULL,
+        [Content] NVARCHAR(2000) NOT NULL,
+        [IsRead] BIT NOT NULL DEFAULT 0,
+        [ReadAt] DATETIME2 NULL,
+        [CreatedAt] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME2 NULL,
+        [IsDeleted] BIT NOT NULL DEFAULT 0,
+        CONSTRAINT FK_Messages_Conversations FOREIGN KEY ([ConversationId]) REFERENCES [dbo].[Conversations]([Id]) ON DELETE CASCADE,
+        CONSTRAINT FK_Messages_Senders FOREIGN KEY ([SenderId]) REFERENCES [dbo].[Users]([Id])
+    );
+    
+    CREATE INDEX IX_Messages_ConversationId ON [dbo].[Messages]([ConversationId]);
+    CREATE INDEX IX_Messages_SenderId ON [dbo].[Messages]([SenderId]);
+    CREATE INDEX IX_Messages_CreatedAt ON [dbo].[Messages]([CreatedAt]);
+    CREATE INDEX IX_Messages_IsRead ON [dbo].[Messages]([IsRead]);
+    PRINT 'Table Messages created successfully.';
+END
+GO
+
+-- =============================================
+-- Table: GarmentAvailabilities
+-- Description: Calendrier de disponibilité des vêtements (3 mois)
+-- =============================================
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[GarmentAvailabilities]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[GarmentAvailabilities] (
+        [Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT NEWID(),
+        [GarmentId] UNIQUEIDENTIFIER NOT NULL,
+        [Date] DATE NOT NULL,
+        [IsAvailable] BIT NOT NULL DEFAULT 1,
+        [BlockedReason] INT NULL, -- 0=OwnerBlocked, 1=Rental, 2=Maintenance
+        [RentalId] UNIQUEIDENTIFIER NULL,
+        [Notes] NVARCHAR(500) NULL,
+        [CreatedAt] DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+        [UpdatedAt] DATETIME2 NULL,
+        [IsDeleted] BIT NOT NULL DEFAULT 0,
+        CONSTRAINT FK_GarmentAvailabilities_Garments FOREIGN KEY ([GarmentId]) REFERENCES [dbo].[Garments]([Id]) ON DELETE CASCADE,
+        CONSTRAINT FK_GarmentAvailabilities_Rentals FOREIGN KEY ([RentalId]) REFERENCES [dbo].[Rentals]([Id]) ON DELETE SET NULL
+    );
+    
+    CREATE INDEX IX_GarmentAvailabilities_GarmentId ON [dbo].[GarmentAvailabilities]([GarmentId]);
+    CREATE INDEX IX_GarmentAvailabilities_Date ON [dbo].[GarmentAvailabilities]([Date]);
+    CREATE UNIQUE INDEX IX_GarmentAvailabilities_GarmentId_Date_Unique ON [dbo].[GarmentAvailabilities]([GarmentId], [Date]);
+    PRINT 'Table GarmentAvailabilities created successfully.';
+END
+GO
+
+-- =============================================
 -- Vues utiles
 -- =============================================
 
@@ -310,7 +397,7 @@ GO
 
 PRINT '==============================================';
 PRINT 'Database schema created successfully!';
-PRINT 'Tables created: Users, RefreshTokens, Garments, GarmentImages, Rentals, Payments, Reviews';
+PRINT 'Tables created: Users, RefreshTokens, Garments, GarmentImages, Rentals, Payments, Reviews, Conversations, Messages, GarmentAvailabilities';
 PRINT 'Views created: vw_GarmentStats, vw_OwnerRevenue';
 PRINT '==============================================';
 GO

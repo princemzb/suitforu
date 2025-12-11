@@ -1,4 +1,5 @@
 using AutoMapper;
+using SuitForU.Application.DTOs;
 using SuitForU.Application.DTOs.Auth;
 using SuitForU.Application.DTOs.Garments;
 using SuitForU.Application.DTOs.Rentals;
@@ -62,5 +63,16 @@ public class MappingProfile : Profile
 
         CreateMap<CreatePaymentDto, Payment>()
             .ForMember(dest => dest.Id, opt => opt.Ignore());
+
+        // Conversation mappings
+        CreateMap<Conversation, ConversationDto>();
+        
+        CreateMap<Message, MessageDto>()
+            .ForMember(dest => dest.SenderName, opt => opt.MapFrom(src => $"{src.Sender.FirstName} {src.Sender.LastName}"))
+            .ForMember(dest => dest.SenderProfilePicture, opt => opt.MapFrom(src => src.Sender.ProfilePictureUrl));
+
+        // Availability mappings
+        CreateMap<GarmentAvailability, AvailabilityDto>()
+            .ForMember(dest => dest.BlockedReason, opt => opt.MapFrom(src => src.BlockedReason != null ? src.BlockedReason.ToString() : null));
     }
 }

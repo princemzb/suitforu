@@ -17,6 +17,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Review> Reviews => Set<Review>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Conversation> Conversations => Set<Conversation>();
+    public DbSet<Message> Messages => Set<Message>();
+    public DbSet<GarmentAvailability> GarmentAvailabilities => Set<GarmentAvailability>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

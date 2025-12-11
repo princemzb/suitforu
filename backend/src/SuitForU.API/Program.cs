@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using FluentValidation;
 using SuitForU.Application.Interfaces;
 using SuitForU.Application.Mappings;
+using SuitForU.Application.Services;
 using SuitForU.Domain.Interfaces;
 using SuitForU.Infrastructure.Persistence;
 using SuitForU.Infrastructure.Repositories;
@@ -125,8 +126,10 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IFileStorageService, FileStorageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGarmentService, GarmentService>();
+builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IRentalService, RentalService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IConversationService, ConversationService>();
 
 var app = builder.Build();
 

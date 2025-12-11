@@ -9,6 +9,18 @@ L'API suit une **Clean Architecture** avec 4 couches :
 3. **Infrastructure** : DbContext, Repositories, Services externes
 4. **API** : Controllers, Middleware, Configuration
 
+## ✨ Fonctionnalités implémentées
+
+- ✅ **Authentification JWT** avec Refresh Token Rotation
+- ✅ **Gestion des vêtements** (CRUD + upload images)
+- ✅ **Workflow de location** complet (Pending → Accepted → Confirmed → Active → Completed)
+- ✅ **Paiements Stripe** (simulation MVP)
+- ✅ **Messagerie contextuelle** (1 conversation par vêtement entre 2 utilisateurs)
+- ✅ **Calendrier de disponibilité** (3 mois, blocage manuel/automatique)
+- ✅ **Système d'avis** et notes
+- ✅ **10 tables** avec relations complètes
+- ✅ **37 endpoints REST** documentés
+
 ## 📋 Prérequis
 
 - [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
@@ -66,6 +78,13 @@ L'API sera disponible sur : `https://localhost:5001` et `http://localhost:5000`
 
 La documentation Swagger : `https://localhost:5001` (page d'accueil en développement)
 
+## 📚 Documentation
+
+- **[API Endpoints](API_ENDPOINTS.md)** - Documentation complète des 37 endpoints
+- **[Database Schema](DATABASE.md)** - Schéma de la base de données (10 tables)
+- **[Tests Swagger](TESTS_SWAGGER.md)** - Scénarios de test complets
+- **[Implementation Status](../IMPLEMENTATION.md)** - État du projet
+
 ## 📂 Structure du Projet
 
 ```
@@ -78,6 +97,13 @@ backend/
 │   │   │   ├── User.cs
 │   │   │   ├── Garment.cs
 │   │   │   ├── GarmentImage.cs
+│   │   │   ├── Rental.cs
+│   │   │   ├── Payment.cs
+│   │   │   ├── Review.cs
+│   │   │   ├── RefreshToken.cs
+│   │   │   ├── Conversation.cs
+│   │   │   ├── Message.cs
+│   │   │   └── GarmentAvailability.cs
 │   │   │   ├── Rental.cs
 │   │   │   ├── Payment.cs
 │   │   │   ├── Review.cs

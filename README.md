@@ -52,8 +52,8 @@ suitforu/
 **Responsabilité**: Logique métier pure, indépendante de toute technologie
 
 **Contenu**:
-- **Entities**: User, Garment, Rental, Payment, Review
-- **Enums**: AuthProvider, GarmentType, GarmentCondition, RentalStatus, PaymentStatus
+- **Entities**: User, Garment, GarmentImage, Rental, Payment, Review, RefreshToken, Conversation, Message, GarmentAvailability
+- **Enums**: AuthProvider, GarmentType, GarmentCondition, RentalStatus, PaymentStatus, PaymentType, PaymentMethod, AvailabilityBlockReason
 - **Interfaces**: IRepository, IUnitOfWork, repositories spécifiques
 
 **Principe**: Aucune dépendance externe, code métier pur

@@ -31,6 +31,23 @@ React TypeScript with Vite - Elegant wedding/ceremony clothing rental platform
 - **Style**: Cards élégantes, animations douces, espacement généreux
 
 ## Backend Integration
-- API URL: http://localhost:5156
-- JWT Authentication avec Refresh Token
-- 26 endpoints disponibles (Auth, Garments, Rentals, Payments)
+- API URL: http://localhost:5001 (https://localhost:5001 en HTTPS)
+- JWT Authentication avec Refresh Token Rotation
+- 37 endpoints disponibles répartis sur 6 controllers:
+  - Auth (7): Register, Login, Refresh, Logout, External, ConfirmEmail, Me
+  - Garments (7): CRUD, Search, Upload, MyGarments
+  - Rentals (7): Create, Get, MyRentals, OwnerRentals, Accept, Confirm, Cancel
+  - Payments (5): CreateIntent, Confirm, MyPayments, Refund, Webhook
+  - Conversations (6): Create, List, GetMessages, SendMessage, MarkRead
+  - Availability (4): GetCalendar, Check, Block, Unblock
+
+## Features to Implement
+- ✅ Authentication (JWT + Refresh Token)
+- ✅ Garments browsing and search
+- ✅ Rental booking workflow
+- ✅ Payment integration (Stripe)
+- ✅ Real-time messaging (per garment)
+- ✅ Availability calendar (3 months view)
+- ⏳ User profile management
+- ⏳ Reviews and ratings
+- ⏳ Notifications

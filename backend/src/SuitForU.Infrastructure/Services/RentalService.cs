@@ -1,6 +1,7 @@
 using AutoMapper;
 using SuitForU.Application.DTOs.Rentals;
 using SuitForU.Application.Interfaces;
+using SuitForU.Application.Services;
 using SuitForU.Domain.Entities;
 using SuitForU.Domain.Enums;
 using SuitForU.Domain.Interfaces;
@@ -11,11 +12,13 @@ public class RentalService : IRentalService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IAvailabilityService _availabilityService;
 
-    public RentalService(IUnitOfWork unitOfWork, IMapper mapper)
+    public RentalService(IUnitOfWork unitOfWork, IMapper mapper, IAvailabilityService availabilityService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _availabilityService = availabilityService;
     }
 
     public async Task<RentalDto> CreateRentalAsync(Guid renterId, CreateRentalDto createDto, CancellationToken cancellationToken = default)
@@ -216,6 +219,9 @@ public class RentalService : IRentalService
         await _unitOfWork.Rentals.UpdateAsync(rental, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
+        // Bloquer automatiquement les dates dans le calendrier de disponibilité
+        await _availabilityService.BlockDatesForRentalAsync(rental.GarmentId, rental.Id, rental.StartDate, rental.EndDate);
+
         return _mapper.Map<RentalDto>(rental);
     }
 
@@ -312,5 +318,8 @@ public class RentalService : IRentalService
 
         await _unitOfWork.Rentals.UpdateAsync(rental, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // Libérer automatiquement les dates dans le calendrier de disponibilité
+        await _availabilityService.UnblockDatesForRentalAsync(rental.Id);
     }
 }

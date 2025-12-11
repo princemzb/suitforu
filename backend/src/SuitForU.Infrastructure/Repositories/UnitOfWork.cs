@@ -16,6 +16,9 @@ public class UnitOfWork : IUnitOfWork
     private IRepository<Domain.Entities.Review>? _reviews;
     private IRepository<Domain.Entities.GarmentImage>? _garmentImages;
     private IRefreshTokenRepository? _refreshTokens;
+    private IRepository<Domain.Entities.Conversation>? _conversations;
+    private IRepository<Domain.Entities.Message>? _messages;
+    private IRepository<Domain.Entities.GarmentAvailability>? _garmentAvailabilities;
 
     public UnitOfWork(
         ApplicationDbContext context,
@@ -38,6 +41,9 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<Domain.Entities.Review> Reviews => _reviews ??= new Repository<Domain.Entities.Review>(_context);
     public IRepository<Domain.Entities.GarmentImage> GarmentImages => _garmentImages ??= new Repository<Domain.Entities.GarmentImage>(_context);
     public IRefreshTokenRepository RefreshTokens => _refreshTokens ??= new RefreshTokenRepository(_context);
+    public IRepository<Domain.Entities.Conversation> Conversations => _conversations ??= new Repository<Domain.Entities.Conversation>(_context);
+    public IRepository<Domain.Entities.Message> Messages => _messages ??= new Repository<Domain.Entities.Message>(_context);
+    public IRepository<Domain.Entities.GarmentAvailability> GarmentAvailabilities => _garmentAvailabilities ??= new Repository<Domain.Entities.GarmentAvailability>(_context);
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

@@ -329,72 +329,172 @@ Annuler une réservation
 
 ## 💳 Payments (PaymentsController)
 
+### Configuration Stripe
+
+⚡ **Intégration Stripe complète** - Voir [STRIPE_SETUP.md](./STRIPE_SETUP.md) pour la configuration détaillée.
+
+**Flux de paiement:**
+1. Backend crée un `PaymentIntent` via Stripe API
+2. Client confirme le paiement avec Stripe.js et `clientSecret`
+3. Stripe envoie un webhook `payment_intent.succeeded`
+4. Backend vérifie le statut et met à jour la DB
+
+---
+
 ### 1. POST /api/payments/create-intent
-Créer un PaymentIntent Stripe (simulation MVP)
+Créer un PaymentIntent Stripe réel
 
 **Headers:** `Authorization: Bearer {token}`
 
 **Body:**
 ```json
 {
-  "rentalId": "guid",
-  "type": "Rental",
-  "method": "CreditCard"
+  "rentalId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
 }
 ```
 
 **Response 200:**
 ```json
 {
-  "paymentIntentId": "pi_simulated_123",
-  "clientSecret": "pi_simulated_123_secret",
-  "amount": 150.00,
-  "currency": "EUR",
-  "status": "Pending",
-  "paymentId": "guid"
+  "success": true,
+  "data": {
+    "paymentIntentId": "pi_3NqZ7H2eZvKYlo2C0w8qz9Xk",
+    "clientSecret": "pi_3NqZ7H2eZvKYlo2C0w8qz9Xk_secret_abc123...",
+    "amount": 150.00,
+    "currency": "eur",
+    "status": "requires_payment_method"
+  },
+  "message": "Payment intent created successfully"
 }
 ```
+
+**Notes:**
+- Le `clientSecret` est utilisé côté client avec Stripe.js
+- Le montant inclut le prix de location + caution
+- Nécessite que la location soit en statut `OwnerAccepted`
 
 ---
 
 ### 2. POST /api/payments/confirm
-Confirmer un paiement
+Confirmer un paiement après succès Stripe
 
 **Headers:** `Authorization: Bearer {token}`
 
 **Body:**
 ```json
 {
-  "paymentId": "guid"
+  "paymentIntentId": "pi_3NqZ7H2eZvKYlo2C0w8qz9Xk"
 }
 ```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "guid",
+    "rentalId": "guid",
+    "userId": "guid",
+    "type": "Rental",
+    "method": "CreditCard",
+    "amount": 150.00,
+    "currency": "EUR",
+    "status": "Succeeded",
+    "paymentIntentId": "pi_3NqZ...",
+    "stripeChargeId": "ch_3NqZ...",
+    "transactionId": "pi_3NqZ...",
+    "processedAt": "2025-12-11T10:30:00Z"
+  },
+  "message": "Payment confirmed successfully"
+}
+```
+
+**Erreurs possibles:**
+- `400` : Payment already processed
+- `400` : Payment not succeeded (si Stripe retourne un statut autre que "succeeded")
+- `404` : Payment not found
 
 ---
 
 ### 3. GET /api/payments/my-payments
-Mes paiements
+Historique de mes paiements
 
 **Headers:** `Authorization: Bearer {token}`
 
----
-
-### 4. POST /api/payments/{id}/refund
-Rembourser un paiement
-
-**Headers:** `Authorization: Bearer {token}`
-
-**Body:**
+**Response 200:**
 ```json
 {
-  "amount": 150.00,
-  "reason": "Annulation de la location"
+  "success": true,
+  "data": [
+    {
+      "id": "guid",
+      "rentalId": "guid",
+      "type": "Rental",
+      "method": "CreditCard",
+      "amount": 150.00,
+      "currency": "EUR",
+      "status": "Succeeded",
+      "paymentIntentId": "pi_3NqZ...",
+      "stripeChargeId": "ch_3NqZ...",
+      "createdAt": "2025-12-11T10:00:00Z",
+      "processedAt": "2025-12-11T10:30:00Z"
+    }
+  ]
 }
 ```
 
 ---
 
+### 4. POST /api/payments/{id}/refund
+Rembourser un paiement via Stripe
+
+**Headers:** `Authorization: Bearer {token}`
+
+**Path Params:** `id` (guid du paiement)
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "guid",
+    "status": "Refunded",
+    "amount": 150.00,
+    "updatedAt": "2025-12-11T11:00:00Z"
+  },
+  "message": "Payment refunded successfully"
+}
+```
+
+**Notes:**
+- Crée un vrai `Refund` via Stripe API
+- Le montant est remboursé intégralement
+- Nécessite que le paiement soit en statut `Succeeded`
+
+---
+
 ### 5. POST /api/payments/webhook
-Webhook Stripe (simulation)
+Webhook Stripe (événements de paiement)
+
+**Méthode:** `POST`  
+**Auth:** Aucune (signature Stripe validée)
+
+**Headers:**
+- `Stripe-Signature` : Signature du webhook
+
+**Body:** Event JSON Stripe
+
+**Événements gérés:**
+- `payment_intent.succeeded` : Log de confirmation (paiement déjà traité par /confirm)
+- `payment_intent.payment_failed` : Log d'échec
+- `charge.refunded` : Log de remboursement
+
+**Response 200:** OK  
+**Response 400:** Signature invalide
+
+**Configuration:**
+- URL: `https://your-domain.com/api/payments/webhook`
+- Voir [STRIPE_SETUP.md](./STRIPE_SETUP.md) pour configurer le webhook dans le Dashboard Stripe
 
 ---
 

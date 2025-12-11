@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using SuitForU.Application.DTOs.Common;
 using SuitForU.Application.DTOs.Payments;
 using SuitForU.Application.Interfaces;
@@ -13,11 +14,16 @@ public class PaymentsController : ControllerBase
 {
     private readonly IPaymentService _paymentService;
     private readonly ILogger<PaymentsController> _logger;
+    private readonly IConfiguration _configuration;
 
-    public PaymentsController(IPaymentService paymentService, ILogger<PaymentsController> logger)
+    public PaymentsController(
+        IPaymentService paymentService, 
+        ILogger<PaymentsController> logger,
+        IConfiguration configuration)
     {
         _paymentService = paymentService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -177,26 +183,55 @@ public class PaymentsController : ControllerBase
     {
         try
         {
-            // TODO: Implémenter la logique webhook Stripe
-            // var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-            // var stripeEvent = EventUtility.ConstructEvent(
-            //     json,
-            //     Request.Headers["Stripe-Signature"],
-            //     _configuration["Stripe:WebhookSecret"]
-            // );
+            var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             
-            // switch (stripeEvent.Type)
-            // {
-            //     case "payment_intent.succeeded":
-            //         var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-            //         // Mettre à jour le paiement en base
-            //         break;
-            //     case "payment_intent.payment_failed":
-            //         // Gérer l'échec
-            //         break;
-            // }
+            // Vérifier la signature du webhook
+            var webhookSecret = _configuration["Stripe:WebhookSecret"];
+            Event stripeEvent;
+            
+            try
+            {
+                stripeEvent = EventUtility.ConstructEvent(
+                    json,
+                    Request.Headers["Stripe-Signature"],
+                    webhookSecret
+                );
+            }
+            catch (StripeException ex)
+            {
+                _logger.LogWarning(ex, "Webhook signature verification failed");
+                return BadRequest();
+            }
 
-            _logger.LogInformation("Stripe webhook received");
+            _logger.LogInformation("Stripe webhook received: {EventType}", stripeEvent.Type);
+
+            // Traiter les événements
+            switch (stripeEvent.Type)
+            {
+                case "payment_intent.succeeded":
+                    var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                    _logger.LogInformation("PaymentIntent {PaymentIntentId} succeeded", paymentIntent?.Id);
+                    
+                    // Le paiement sera déjà confirmé via l'endpoint /confirm côté client
+                    // Ce webhook sert de backup et de vérification
+                    break;
+
+                case "payment_intent.payment_failed":
+                    var failedIntent = stripeEvent.Data.Object as PaymentIntent;
+                    _logger.LogWarning("PaymentIntent {PaymentIntentId} failed", failedIntent?.Id);
+                    // On pourrait mettre à jour le statut en base si nécessaire
+                    break;
+
+                case "charge.refunded":
+                    var charge = stripeEvent.Data.Object as Charge;
+                    _logger.LogInformation("Charge {ChargeId} refunded", charge?.Id);
+                    break;
+
+                default:
+                    _logger.LogInformation("Unhandled webhook event type: {EventType}", stripeEvent.Type);
+                    break;
+            }
+
             return Ok();
         }
         catch (Exception ex)

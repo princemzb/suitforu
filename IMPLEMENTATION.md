@@ -15,7 +15,7 @@
   - `Garment` - Vêtements à louer
   - `GarmentImage` - Images des vêtements (max 3 par vêtement)
   - `Rental` - Locations avec workflow complet
-  - `Payment` - Paiements avec simulation Stripe
+  - `Payment` - Paiements avec intégration Stripe complète
   - `Review` - Avis et notes
   - `RefreshToken` - Tokens JWT avec rotation et traçabilité
   - `Conversation` - Conversations entre utilisateurs autour d'un vêtement
@@ -81,7 +81,7 @@
 ✅ Garments                 // Vêtements de cérémonie
 ✅ GarmentImages            // Images (max 3 par vêtement)
 ✅ Rentals                  // Locations avec workflow
-✅ Payments                 // Paiements Stripe
+✅ Payments                 // Intégration Stripe complète
 ✅ Reviews                  // Avis et notes
 ✅ Conversations            // Messagerie contextuelle
 ✅ Messages                 // Messages avec statut lu
@@ -96,6 +96,7 @@
 ✅ backend/API_ENDPOINTS.md     // 37 endpoints documentés
 ✅ backend/DATABASE.md          // Schéma de BDD complet
 ✅ backend/TESTS_SWAGGER.md     // Scénarios de test
+✅ backend/STRIPE_SETUP.md      // Configuration Stripe détaillée
 ✅ backend/database_creation_script.sql  // Script de création
 ✅ .github/copilot-instructions.md       // Instructions Copilot
 ```

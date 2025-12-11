@@ -45,7 +45,12 @@ React TypeScript with Vite - Elegant wedding/ceremony clothing rental platform
 - ✅ Authentication (JWT + Refresh Token)
 - ✅ Garments browsing and search
 - ✅ Rental booking workflow
-- ✅ Payment integration (Stripe)
+- ✅ **Payment integration (Stripe) - COMPLETE**
+  - ✅ Stripe.net 50.0.0 integration
+  - ✅ PaymentIntent creation and confirmation
+  - ✅ Webhook signature validation
+  - ✅ Refund support
+  - ✅ Full documentation (STRIPE_SETUP.md)
 - ✅ Real-time messaging (per garment)
 - ✅ Availability calendar (3 months view)
 - ⏳ User profile management

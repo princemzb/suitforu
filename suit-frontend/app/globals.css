@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  /* Define your semantic colors here directly in CSS for v4 */
+  --color-background: #f8fafc;
+  --color-foreground: #0f172a;
+  --color-primary: #4f46e5;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #ffffff;
+  --color-secondary-foreground: #0f172a;
+  --color-tertiary: #e2e8f0;
+  --color-tertiary-foreground: #64748b;
+}
+
+/* Dark mode overrides using the new @variant syntax or standard media queries */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* DEFAULT = LIGHT MODE */
+    --background: #f8fafc; /* Light Grey/White */
+    --foreground: #0d0341; /* Dark Text */
+    --primary: #4f46e5;
+    --secondary: #ffffff;
+    --tertiary: #e2e8f0;
+  }
+}
+
+/* Or if using class-based dark mode (manual toggle) */
+.dark {
+  --color-background: #050505;
+  --color-foreground: #ffffff;
+  --color-primary: #6366f1;
+  --color-secondary: #0a0a0a;
+  --color-secondary-foreground: #e2e8f0;
+  --color-tertiary: #1e1e1e;
+  --color-tertiary-foreground: #94a3b8;
+}
+
+/* Apply variables */
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: background-color 0.3s, color 0.3s;
+}
